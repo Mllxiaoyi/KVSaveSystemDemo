@@ -13,6 +13,7 @@ namespace KVSaveSystem
     
     public abstract class KvSaveDataObj<T>
     {
+        [IgnoreFormat] 
         public virtual T Value { get; set; }
         public bool Equals<T>(T value)
         {

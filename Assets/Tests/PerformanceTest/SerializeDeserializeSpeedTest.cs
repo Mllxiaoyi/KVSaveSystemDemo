@@ -7,25 +7,23 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
+using MemoryPack;
 using Newtonsoft.Json;
+using Nino.Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 public class SerializeDeserializeSpeedTest : MonoBehaviour
 {
-    [LabelText("测试数据量")]
-    public int testCount = 10000;
-    [LabelText("重复次数")]
-    public int repeatTimes = 1;
     
     [Button("测试 XML 序列化")]
-    public void TestXmlSerialization()
+    public void TestXmlSerialization(int testCount, int repeatTimes)
     {
         var data = UtilsForTest.GenerateTestKvPairListData(testCount);
         List<long> serializeTimes = new List<long>(repeatTimes);
         List<long> deserializeTimes = new List<long>(repeatTimes);
-        
+
         for (int i = 0; i < repeatTimes; i++)
         {
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(List<KVPair>));
@@ -47,37 +45,8 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
         UnityEngine.Debug.Log($"XML Serialization: {serializeTimes.Average()} ms. Deserialization: {deserializeTimes.Average()} ms with {testCount} items each.");
     }
     
-    [Button("测试 JSON 序列化")]
-    public void TestJsonSerialization()
-    {
-        var data = UtilsForTest.GenerateTestKvPairListData(testCount);
-        List<long> serializeTimes = new List<long>(repeatTimes);
-        List<long> deserializeTimes = new List<long>(repeatTimes);
-        Dictionary<string, string> dic = new Dictionary<string, string>();
-        foreach (var d in data)
-        {
-            dic.Add(d.Key, d.Value);
-        }
-        
-        for (int i = 0; i < repeatTimes; i++)
-        {
-            Stopwatch sw = Stopwatch.StartNew();
-            string json = JsonConvert.SerializeObject(dic);
-            sw.Stop();
-            serializeTimes.Add(sw.ElapsedMilliseconds);
-            
-            // 使用 ZeroFormatter 进行反序列化
-            sw = Stopwatch.StartNew();
-            var deserializedData = JsonConvert.DeserializeObject(json);
-            sw.Stop();
-            deserializeTimes.Add(sw.ElapsedMilliseconds);
-        }
-        
-        UnityEngine.Debug.Log($"JSON Serialization: {serializeTimes.Average()} ms. Deserialization: {deserializeTimes.Average()} ms with {testCount} items each.");
-    }
-    
     [Button("测试 Binary 序列化")]
-    public void TestBinarySerialization()
+    public void TestBinarySerialization(int testCount, int repeatTimes)
     {
         var data = UtilsForTest.GenerateTestKvPairListData(testCount);
         List<long> serializeTimes = new List<long>(repeatTimes);
@@ -105,8 +74,37 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
         UnityEngine.Debug.Log($"Binary Serialization: {serializeTimes.Average()} ms. Deserialization: {deserializeTimes.Average()} ms with {testCount} items each.");
     }
     
+    [Button("测试 JSON 序列化")]
+    public void TestJsonSerialization(int testCount, int repeatTimes)
+    {
+        var data = UtilsForTest.GenerateTestKvPairListData(testCount);
+        List<long> serializeTimes = new List<long>(repeatTimes);
+        List<long> deserializeTimes = new List<long>(repeatTimes);
+        Dictionary<string, string> dic = new Dictionary<string, string>();
+        foreach (var d in data)
+        {
+            dic.Add(d.Key, d.Value);
+        }
+        
+        for (int i = 0; i < repeatTimes; i++)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            string json = JsonConvert.SerializeObject(dic);
+            sw.Stop();
+            serializeTimes.Add(sw.ElapsedMilliseconds);
+            
+            // 使用 ZeroFormatter 进行反序列化
+            sw = Stopwatch.StartNew();
+            var deserializedData = JsonConvert.DeserializeObject(json);
+            sw.Stop();
+            deserializeTimes.Add(sw.ElapsedMilliseconds);
+        }
+        
+        UnityEngine.Debug.Log($"JSON Serialization: {serializeTimes.Average()} ms. Deserialization: {deserializeTimes.Average()} ms with {testCount} items each.");
+    }
+    
     [Button("测试 ZeroFormatter 序列化")]
-    public void TestZeroFormatterSerialization()
+    public void TestZeroFormatterSerialization(int testCount, int repeatTimes)
     {
         IList<KVPair> data = UtilsForTest.GenerateTestKvPairListData(testCount);
         List<long> serializeTimes = new List<long>(repeatTimes);
@@ -130,58 +128,54 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
         UnityEngine.Debug.Log($"ZeroFormatter Serialization: {serializeTimes.Average()} ms. Deserialization: {deserializeTimes.Average()} ms with {testCount} items each.");
     }
     
-    [Button("测试 string 自定义序列化")]
-    public void TestStringCustomizedSerialization()
+    [Button("测试 MemoryPack 序列化")]
+    public void TestMemoryPackSerialization(int testCount, int repeatTimes)
+    {
+         var data = UtilsForTest.GenerateTestKvPairListData(testCount);
+         List<long> serializeTimes = new List<long>(repeatTimes);
+         List<long> deserializeTimes = new List<long>(repeatTimes);
+        
+         for (int i = 0; i < repeatTimes; i++)
+         {
+             Stopwatch sw = Stopwatch.StartNew();
+             byte[] memoryPackData = MemoryPackSerializer.Serialize(data);
+             sw.Stop();
+             serializeTimes.Add(sw.ElapsedMilliseconds);
+             
+             sw = Stopwatch.StartNew();
+             var deserializedData = MemoryPackSerializer.Deserialize<List<KVPair>>(memoryPackData);
+             sw.Stop();
+             deserializeTimes.Add(sw.ElapsedMilliseconds);
+         }
+
+        UnityEngine.Debug.Log($"MemoryPack Serialization: {serializeTimes.Average()} ms. Deserialization: {deserializeTimes.Average()} ms with {testCount} items each.");
+    }
+
+    [Button("测试 Nino 序列化")]
+    public void TestNinoSerialization(int testCount, int repeatTimes)
     {
         var data = UtilsForTest.GenerateTestKvPairListData(testCount);
         List<long> serializeTimes = new List<long>(repeatTimes);
         List<long> deserializeTimes = new List<long>(repeatTimes);
-        
+
         for (int i = 0; i < repeatTimes; i++)
         {
-            List<string> dataBuilder = new List<string>(testCount);
             Stopwatch sw = Stopwatch.StartNew();
-            for (int j = 0; j < data.Count; j++)
-            {
-                string serializedData = data.ToString();
-                dataBuilder.Add(serializedData);
-            }
+            byte[] protobufData = NinoSerializer.Serialize(data);
             sw.Stop();
             serializeTimes.Add(sw.ElapsedMilliseconds);
-            
+
             sw = Stopwatch.StartNew();
-            for (int j = 0; j < data.Count; j++)
-            {
-                string serializedData = dataBuilder[j];
-                var deserializedData = KVPair.FromString(serializedData);
-            }
+            var deserializedData = NinoDeserializer.Deserialize<List<KVPair>>(protobufData);
             sw.Stop();
             deserializeTimes.Add(sw.ElapsedMilliseconds);
         }
-        
-        UnityEngine.Debug.Log($"Custom String Serialization: {serializeTimes.Average()} ms. Deserialization: {deserializeTimes.Average()} ms with {testCount} items each.");
-    }
 
-    // [Button("测试 Protobuf 序列化")]
-    // public void TestProtobufSerialization()
-    // {
-    //     var data = UtilsForTest.GenerateTestKvPairListData(testCount);
-    //     List<long> times = new List<long>(repeatTimes);
-    //
-    //     Stopwatch sw = Stopwatch.StartNew();
-    //     for (int i = 0; i < repeatTimes; i++)
-    //     {
-    //         byte[] protobufData = ProtoBuf.Serializer.Serialize(data);
-    //         var deserializedData = ProtoBuf.Serializer.Deserialize<List<KVPair>>(protobufData);
-    //     }
-    //     sw.Stop();
-    //     times.Add(sw.ElapsedMilliseconds);
-    //
-    //     UnityEngine.Debug.Log($"Protobuf Serialization: {times.Average()} ms with {testCount} items each.");
-    // }
+        UnityEngine.Debug.Log($"Nino Serialization: {serializeTimes.Average()} ms. Deserialization: {deserializeTimes.Average()} ms with {testCount} items each.");
+    }
     
     [Button("测试 Json + AES 序列化")]
-    public void TestJsonAESSerialization()
+    public void TestJsonAESSerialization(int testCount, int repeatTimes)
     {
         var data = UtilsForTest.GenerateTestKvPairListData(testCount);
         List<long> serializeTimes = new List<long>(repeatTimes);
@@ -215,7 +209,7 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
     
     
     [Button("测试 ZeroFormatter + AES 序列化")]
-    public void TestZeroFormatterAESSerialization()
+    public void TestZeroFormatterAESSerialization(int testCount, int repeatTimes)
     {
         var data = UtilsForTest.GenerateTestKvPairListData(testCount);
         List<long> times = new List<long>(repeatTimes);
@@ -291,12 +285,12 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
     
     
     
-    
+    /*
     [Button("测试 KVSaveSystem 保存")]
     public void TestSaveSystemSerialization()
     {
-        var data = UtilsForTest.GenerateTestKvPairListData(testCount);
-        List<long> times = new List<long>(repeatTimes);
+        var data = UtilsForTest.GenerateTestKvPairListData(TestCount);
+        List<long> times = new List<long>(RepeatTimes);
         
         for (int i = 0; i < repeatTimes; i++)
         {
@@ -316,16 +310,16 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
         sw.Stop();
         times.Add(sw.ElapsedMilliseconds);
         
-        UnityEngine.Debug.Log($"KVSaveSystem Serialization: {times.Average()} ms with {testCount} items each.");
+        UnityEngine.Debug.Log($"KVSaveSystem Serialization: {times.Average()} ms with {TestCount} items each.");
     }
     
     
     [Button("测试 Json 与 ZeroFormat 序列化")]
     public void TestJsonZeroFormatterSerialization()
     {
-        var data = UtilsForTest.GenerateTestKvPairListData(testCount);
+        var data = UtilsForTest.GenerateTestKvPairListData(TestCount);
         string json = JsonConvert.SerializeObject(data);
-        List<long> times = new List<long>(repeatTimes);
+        List<long> times = new List<long>(RepeatTimes);
         
         string filePath = Application.persistentDataPath + "/test.json";
         if (File.Exists(filePath))
@@ -345,7 +339,7 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
         {
             writer.WriteLineAsync("异步文本");
         }
-        Debug.Log($"KVSaveSystem Serialization: {times.Average()} ms with {testCount} items each.");
+        Debug.Log($"KVSaveSystem Serialization: {times.Average()} ms with {TestCount} items each.");
         
         
         sw = Stopwatch.StartNew();
@@ -357,12 +351,12 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
         sw.Stop();
         times.Add(sw.ElapsedMilliseconds);
         
-        UnityEngine.Debug.Log($"KVSaveSystem Serialization: {times.Average()} ms with {testCount} items each.");
+        UnityEngine.Debug.Log($"KVSaveSystem Serialization: {times.Average()} ms with {TestCount} items each.");
     }
     
     
     [Button("测试 ZeroFormatter 写文件")]
-    public void TestZeroFormatterWriteFile()
+    public void TestZeroFormatterWriteFile(int testCount, int repeatTimes)
     {
         IList<KVPair> data = UtilsForTest.GenerateTestKvPairListData(testCount);
         string filePath = Application.persistentDataPath + "/test.bin";
@@ -382,9 +376,31 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
         
         UnityEngine.Debug.Log($"ZeroFormatter Write File: {sw.ElapsedMilliseconds} ms with {testCount} items each.");
     }
+
+    [Button("测试 Nino 写文件")]
+    public void TestNinoWriteFile(int testCount, int repeatTimes)
+    {
+        IList<KVPair> data = UtilsForTest.GenerateTestKvPairListData(testCount);
+        string filePath = Application.persistentDataPath + "/test_nino.bin";
+
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+
+        Stopwatch sw = Stopwatch.StartNew();
+        using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096))
+        {
+            byte[] ninoData = NinoSerializer.Serialize(data);
+            fs.Write(ninoData, 0, ninoData.Length);
+        }
+        sw.Stop();
+
+        UnityEngine.Debug.Log($"Nino Write File: {sw.ElapsedMilliseconds} ms with {testCount} items each.");
+    }
     
     [Button("测试自定义 String 写文件")]
-    public void TestCustomStringWriteFile()
+    public void TestCustomStringWriteFile(int testCount, int repeatTimes)
     {
         IList<KVPair> data = UtilsForTest.GenerateTestKvPairListData(testCount);
         string filePath = Application.persistentDataPath + "/test_custom_string.txt";
@@ -408,4 +424,5 @@ public class SerializeDeserializeSpeedTest : MonoBehaviour
         
         UnityEngine.Debug.Log($"Custom String Write File: {sw.ElapsedMilliseconds} ms with {testCount} items each.");
     }
+    */
 }

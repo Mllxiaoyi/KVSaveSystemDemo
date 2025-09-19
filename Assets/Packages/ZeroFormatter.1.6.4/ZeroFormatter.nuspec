@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>ZeroFormatter</id>
+    <version>1.6.4</version>
+    <title>ZeroFormatter</title>
+    <authors>neuecc</authors>
+    <owners>y.neuecc</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>https://github.com/neuecc/ZeroFormatter/</projectUrl>
+    <description>Infinitely fast serializer for .NET, .NET Core and Unity.</description>
+    <releaseNotes>modify resolver priority for extend types. add -u option for zfc.exe.</releaseNotes>
+    <tags>ZeroFormatter, Serialization, Formatter, Serializer</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="ZeroFormatter.Interfaces" version="1.6.4" />
+      </group>
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="ZeroFormatter.Interfaces" version="1.6.4" />
+        <dependency id="System.Reflection.Emit" version="4.0.1" />
+        <dependency id="System.Runtime" version="4.1.0" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0" />
+        <dependency id="System.Collections" version="4.0.11" />
+        <dependency id="System.Linq" version="4.1.0" />
+        <dependency id="System.Linq.Expressions" version="4.1.0" />
+        <dependency id="System.Runtime.InteropServices" version="4.1.0" />
+        <dependency id="System.Reflection" version="4.1.0" />
+        <dependency id="System.Reflection.Extensions" version="4.0.1" />
+        <dependency id="System.Threading" version="4.0.11" />
+        <dependency id="System.Text.Encoding" version="4.0.11" />
+        <dependency id="System.Text.Encoding.Extensions" version="4.0.11" />
+        <dependency id="System.Collections.Concurrent" version="4.0.12" />
+        <dependency id="System.ObjectModel" version="4.0.12" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.5" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

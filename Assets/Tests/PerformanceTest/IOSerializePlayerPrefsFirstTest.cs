@@ -8,13 +8,10 @@ using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class IOSerializePlayerPrefsFirstTest : MonoBehaviour
 {
-    [LabelText("测试数据量")] 
-    public int testCount = 10000;
-    [LabelText("重复次数")] 
-    public int repeatTimes = 1;
     [LabelText("测试文件名称")] 
     public string testFilePath = "IOSerializePlayerPrefsFirstTest.xml";
 
@@ -23,7 +20,7 @@ public class IOSerializePlayerPrefsFirstTest : MonoBehaviour
     public string SaveFilePath => Path.Combine(Application.persistentDataPath, testFilePath);
 
     [Button("开始测试 PlayerPrefs、I/O+XML、Json 和 Dictionary的写入速度")]
-    public void StartTest()
+    public void DoFirstSimpleWriteSpeedTest(int testCount, int repeatTimes)
     {
         UnityEngine.Debug.Log("-----测试 PlayerPrefs、I/O+XML、Json 和 Dictionary的写入速度------");
         var kvList = UtilsForTest.GenerateTestKvPairListData(testCount);
@@ -85,7 +82,7 @@ public class IOSerializePlayerPrefsFirstTest : MonoBehaviour
 
 
     [Button("开始XML写入分段耗时测试")]
-    public void DoWriteSpeedTestXML()
+    public void DoWriteSpeedTestXML(int testCount, int repeatTimes)
     {
         var datas = UtilsForTest.GenerateTestKvPairListData(testCount);
 
@@ -201,7 +198,7 @@ public class IOSerializePlayerPrefsFirstTest : MonoBehaviour
 
 
     [Button("开始Json写入分段耗时测试")]
-    public void DoWriteSpeedTestJson()
+    public void DoWriteSpeedTestJson(int testCount, int repeatTimes)
     {
         var datas = UtilsForTest.GenerateTestKvPairListData(testCount);
 
@@ -210,8 +207,7 @@ public class IOSerializePlayerPrefsFirstTest : MonoBehaviour
         {
             File.Create(SaveFilePath).Dispose();
         }
-
-
+        
         GC.Collect();
 
         // 测试 1: I/O + 序列化 + 加密

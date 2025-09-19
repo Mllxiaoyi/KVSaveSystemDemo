@@ -4,27 +4,27 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Text;
+using Newtonsoft.Json;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 public class MemoryMappedFileSpeedTest : MonoBehaviour
 {
-    [LabelText("测试数据量")] public int testCount = 10;
-
-    [LabelText("重复次数")] public int repeatTimes = 1;
+    public int TestCount => TestParamSingleton.TestCount;
+    public int RepeatTimes => TestParamSingleton.RepeatTimes;
 
     private Dictionary<string, string> _dict = new Dictionary<string, string>();
 
     [Button("测试 Dictionary Write")]
     private void DoTestDictionaryWrite()
     {
-        var datas = UtilsForTest.GenerateTestKvPairListData(testCount);
+        var datas = UtilsForTest.GenerateTestKvPairListData(TestCount);
         var dataCnt = datas.Count;
         _dict.Clear();
 
         Stopwatch stopwatch = Stopwatch.StartNew();
-        for (int r = 0; r < repeatTimes; r++)
+        for (int r = 0; r < RepeatTimes; r++)
         {
             for (int i = 0; i < dataCnt; i++)
             {
@@ -40,12 +40,12 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
     [Button("测试 Dictionary Read")]
     private void DoTestDictionaryRead()
     {
-        var datas = UtilsForTest.GenerateTestKvPairListData(testCount);
+        var datas = UtilsForTest.GenerateTestKvPairListData(TestCount);
         var dataCnt = datas.Count;
         Dictionary<string, string> dict = new Dictionary<string, string>(dataCnt);
 
         Stopwatch stopwatch = Stopwatch.StartNew();
-        for (int r = 0; r < repeatTimes; r++)
+        for (int r = 0; r < RepeatTimes; r++)
         {
             foreach (var kvp in dict)
             {
@@ -63,7 +63,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
     [Button("测试 MemoryStream Write")]
     private void DoTestMemoryStreamWrite()
     {
-        var datas = UtilsForTest.GenerateTestKvPairListData(testCount);
+        var datas = UtilsForTest.GenerateTestKvPairListData(TestCount);
         var dataCnt = datas.Count;
         List<string> stringList = new List<string>(datas.Count);
 
@@ -74,7 +74,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
         }
 
         Stopwatch stopwatch = Stopwatch.StartNew();
-        for (int r = 0; r < repeatTimes; r++)
+        for (int r = 0; r < RepeatTimes; r++)
         {
             using (var memoryStream = new MemoryStream())
             using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
@@ -93,7 +93,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
     [Button("测试 MemoryMappedFile Write (ViewAccessor)")]
     private void DoTestMemoryMappedFileWrite()
     {
-        var datas = UtilsForTest.GenerateTestKvPairListData(testCount);
+        var datas = UtilsForTest.GenerateTestKvPairListData(TestCount);
 
         string filePath = Path.Combine(Application.persistentDataPath, "memoryMappedFileSave.txt");
         if (File.Exists(filePath))
@@ -123,7 +123,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
 
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        for (int r = 0; r < repeatTimes; r++)
+        for (int r = 0; r < RepeatTimes; r++)
         {
             using (var mmf = MemoryMappedFile.CreateFromFile(filePath, FileMode.Open, null, fileSize))
             using (var accessor = mmf.CreateViewAccessor(0, fileSize))
@@ -198,7 +198,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
                     position += stringLength;
 
                     string strValue = Encoding.UTF8.GetString(stringBytes);
-                    datas.Add(KVPair.FromString(strValue));
+                    datas.Add(JsonConvert.DeserializeObject<KVPair>(strValue));
                 }
             }
         }
@@ -210,7 +210,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
     [Button("测试 MemoryMappedFile Write (ViewStream)")]
     private void DoTestMemoryMappedFileStreamWrite()
     {
-        var datas = UtilsForTest.GenerateTestKvPairListData(testCount);
+        var datas = UtilsForTest.GenerateTestKvPairListData(TestCount);
         var dataCnt = datas.Count;
         long fileSize = 0;
         List<string> stringList = new List<string>(datas.Count);
@@ -232,7 +232,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
 
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        for (int r = 0; r < repeatTimes; r++)
+        for (int r = 0; r < RepeatTimes; r++)
         {
             using (var mmf = MemoryMappedFile.CreateFromFile(filePath, FileMode.Open, null, fileSize))
             using (var stream = mmf.CreateViewStream())
@@ -263,7 +263,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
             while (streamReader.Peek() > 0)
             {
                 string strValue = streamReader.ReadLine();
-                datas.Add(KVPair.FromString(strValue));
+                datas.Add(JsonConvert.DeserializeObject<KVPair>(strValue));
                 //Debug.Log("Read: " + strValue);
             }
         }
@@ -274,7 +274,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
     [Button("测试 I/O Write")]
     private void DoTestIOWrite()
     {
-        var datas = UtilsForTest.GenerateTestKvPairListData(testCount);
+        var datas = UtilsForTest.GenerateTestKvPairListData(TestCount);
         var dataCnt = datas.Count;
         List<string> stringList = new List<string>(datas.Count);
 
@@ -287,7 +287,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
         string filePath = Path.Combine(Application.persistentDataPath, "ioSave.txt");
 
         Stopwatch stopwatch = Stopwatch.StartNew();
-        for (int r = 0; r < repeatTimes; r++)
+        for (int r = 0; r < RepeatTimes; r++)
         {
             using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
             using (var streamWriter = new StreamWriter(stream, Encoding.UTF8))
@@ -315,7 +315,7 @@ public class MemoryMappedFileSpeedTest : MonoBehaviour
             while (streamReader.Peek() > 0)
             {
                 string strValue = streamReader.ReadLine();
-                datas.Add(KVPair.FromString(strValue));
+                datas.Add(JsonConvert.DeserializeObject<KVPair>(strValue));
                 //Debug.Log("Read: " + strValue);
             }
         }
