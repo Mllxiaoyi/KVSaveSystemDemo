@@ -1,23 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
 using KVSaveSystem;
 using UnityEngine;
 
 public class TimedFlushSaver : MonoBehaviour
 {
-    [SerializeField] private float flushInterval = 5f;
+    [SerializeField] 
+    private float _flushInterval = 5f;
+
+    private float _timer;
     
     private void Start()
     {
-        StartCoroutine(TimedFlushCoroutine(flushInterval));
+        _timer = _flushInterval;
     }
 
-    IEnumerator TimedFlushCoroutine(float interval)
+    private void Update()
     {
-        while (true)
+        _timer -= Time.deltaTime;
+
+        if (_timer <= 0f)
         {
-            yield return new WaitForSeconds(interval);
             KvSaveSystem.SaveAsync();
+            _timer = _flushInterval; // 重置定时器
         }
+    }
+
+    public void ResetTimer()
+    {
+        _timer = _flushInterval;
+    }
+
+    public void ForceFlush()
+    {
+        KvSaveSystem.SaveAsync();
+        ResetTimer();
     }
 }

@@ -13,6 +13,10 @@ public partial class KVPair
     [Index(0)] public virtual string Key { get; set; }
 
     [Index(1)] public virtual string Value { get; set; }
+    
+    public KVPair()
+    {
+    }
 
     [MemoryPackConstructor]
     public KVPair(string key, string value)
