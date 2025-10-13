@@ -18,7 +18,7 @@ public class KvSaveSystemSample : MonoBehaviour
     [Button("Load Sample Data")]
     public void LoadSampleData()
     {
-        KvSaveSystem.LoadAll();
+        KvSaveSystem.LoadAll(SaveConfig.PublicArchiveDirectoryPath);
         var value = KvSaveSystem.GetInt("FirstEnter", 0, "SampleGroup");
         Debug.Log($"FirstEnter: {value}");
     }
@@ -33,12 +33,18 @@ public class KvSaveSystemSample : MonoBehaviour
         KvSaveSystem.SetString("ChangeLine1", "测试\r\n换行\t1", sampleGroupName);
         KvSaveSystem.SetString("ChangeLine2", @"测试
 换行2", sampleGroupName);
-        KvSaveSystem.Save(true);
+        KvSaveSystem.SaveAsync(true);
     }
 
     [Button("Load Multi Data")]
     public void LoadMultiData()
     {
-        KvSaveSystem.LoadAll();
+        KvSaveSystem.LoadAll(SaveConfig.PublicArchiveDirectoryPath);
+    }
+
+    [Button("Print Save Cache Data")]
+    public void PrintSaveCacheData()
+    {
+        KvSaveSystem.PrintSaveCacheData();
     }
 }

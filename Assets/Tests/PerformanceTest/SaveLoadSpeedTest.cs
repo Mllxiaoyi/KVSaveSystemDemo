@@ -101,7 +101,7 @@ public class SaveLoadSpeedTest : MonoBehaviour
         for (int i = 0; i < repeatTimes; i++)
         {
             Stopwatch sw = Stopwatch.StartNew();
-            KVSaveSystem.KvSaveSystem.LoadAllAsync();
+            KVSaveSystem.KvSaveSystem.LoadAllAsync(SaveConfig.PublicArchiveDirectoryPath);
             sw.Stop();
             times.Add(sw.ElapsedMilliseconds);
         }

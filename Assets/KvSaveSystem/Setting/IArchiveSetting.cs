@@ -16,6 +16,8 @@ namespace KVSaveSystem
         /// 是否只能同步保存
         /// </summary>
         bool IsForceSaveSync{ get; }
+        
+        bool IsUserArchive { get; }
     }
 }
 

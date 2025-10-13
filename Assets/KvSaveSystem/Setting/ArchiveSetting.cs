@@ -14,16 +14,16 @@ namespace KVSaveSystem
         [SerializeField]
         private bool _isForceSaveSync;
         public bool IsForceSaveSync => _isForceSaveSync;
-
+        
         [SerializeField]
-        private bool _isLoadAfterLogin;
-        public bool IsLoadAfterLogin => _isLoadAfterLogin;
+        private bool _isUserArchive;
+        public bool IsUserArchive => _isUserArchive;
 
         public ArchiveSetting(ArchiveOperationType archiveOperationMode, bool isForceSaveSync)
         {
             _archiveOperationMode = archiveOperationMode;
             _isForceSaveSync = isForceSaveSync;
-            _isLoadAfterLogin = false;
+            _isUserArchive = false;
         }
     }
 }

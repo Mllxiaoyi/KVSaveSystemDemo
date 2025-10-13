@@ -34,6 +34,11 @@ namespace KVSaveSystem
             {
                 File.Delete(tmpFilePath);
             }
+            
+            // if (!Directory.Exists(SaveConfig.UserArchiveDirectoryPath))
+            // {
+            //     Directory.CreateDirectory(SaveConfig.UserArchiveDirectoryPath);
+            // }
 
             using (Stream stream = StreamFactory.CreateFileStream(tmpFilePath, FileMode.Create, FileAccess.Write))
             {
