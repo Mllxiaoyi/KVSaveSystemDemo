@@ -11,6 +11,8 @@ public class SaveLoadSpeedTest : MonoBehaviour
     public int repeatTimes = 1;
     
     private const string TEST_SAVE = "测试保存";
+    
+    public SaveConfig saveConfig;
 
     [TitleGroup(TEST_SAVE)] 
     [Button("测试 PlayerPrefs 保存")]
@@ -63,7 +65,7 @@ public class SaveLoadSpeedTest : MonoBehaviour
         for (int i = 0; i < repeatTimes; i++)
         {
             Stopwatch sw = Stopwatch.StartNew();
-            KVSaveSystem.KvSaveSystem.SaveAsync();
+            KvSaveSystem.SaveAsyncInternal();
             sw.Stop();
             times.Add(sw.ElapsedMilliseconds);
         }
@@ -101,11 +103,14 @@ public class SaveLoadSpeedTest : MonoBehaviour
         for (int i = 0; i < repeatTimes; i++)
         {
             Stopwatch sw = Stopwatch.StartNew();
-            KVSaveSystem.KvSaveSystem.LoadAllAsync(SaveConfig.PublicArchiveDirectoryPath);
+            KvSaveSystem.LoadAll(SaveConfig.PublicArchiveDirectoryPath);
             sw.Stop();
             times.Add(sw.ElapsedMilliseconds);
         }
 
         UnityEngine.Debug.Log($"KVSaveSystem Load: {times.Average()} ms");
+#if UNITY_EDITOR
+        KvSaveSystem.PrintSaveCacheData();
+#endif
     }
 }

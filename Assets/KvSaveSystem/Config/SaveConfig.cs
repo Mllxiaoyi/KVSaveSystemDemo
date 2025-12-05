@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -31,18 +32,7 @@ public class SaveConfig : ScriptableObject
     
     public const string SAVE_FILE_EXTENSION = ".sav";
 
-    private static string _publicArchiveDirectoryPath;
-    public static string PublicArchiveDirectoryPath
-    {
-        get
-        {
-            if (string.IsNullOrEmpty(_publicArchiveDirectoryPath))
-                _publicArchiveDirectoryPath =
-                    Path.Combine(Application.persistentDataPath, SAVE_PATH_ROOT).Replace('\\', '/');
-
-            return _publicArchiveDirectoryPath;
-        }
-    }
+    public static string PublicArchiveDirectoryPath;
 
     private static string _userKey = "AllUser";
 
@@ -52,19 +42,13 @@ public class SaveConfig : ScriptableObject
         set => _userKey = value;
     }
 
-    private static string _userArchiveDirectoryPath;
+    public static string UserArchiveDirectoryPath;
 
-    public static string UserArchiveDirectoryPath
+
+    private void OnEnable()
     {
-        get
-        {
-            if (string.IsNullOrEmpty(_userArchiveDirectoryPath))
-            {
-                _userArchiveDirectoryPath = Path.Combine(Application.persistentDataPath, UserKey);
-            }
-
-            return _userArchiveDirectoryPath;
-        }
+        PublicArchiveDirectoryPath = Path.Combine(Application.persistentDataPath, SAVE_PATH_ROOT).Replace('\\', '/');
+        UserArchiveDirectoryPath = Path.Combine(Application.persistentDataPath, UserKey).Replace('\\', '/');
     }
 
     /// <summary>

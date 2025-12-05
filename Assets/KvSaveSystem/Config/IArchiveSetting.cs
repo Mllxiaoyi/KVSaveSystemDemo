@@ -1,5 +1,3 @@
-using Sirenix.OdinInspector;
-
 namespace KVSaveSystem
 {
     /// <summary>
@@ -17,7 +15,15 @@ namespace KVSaveSystem
         /// </summary>
         bool IsForceSaveSync{ get; }
         
+        /// <summary>
+        /// 是用户登录后的存档吗
+        /// </summary>
         bool IsUserArchive { get; }
+
+        /// <summary>
+        /// 是懒加载吗
+        /// </summary>
+        bool IsLazyLoad { get; }
     }
 }
 

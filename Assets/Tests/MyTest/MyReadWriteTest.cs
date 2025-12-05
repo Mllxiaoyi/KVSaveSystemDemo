@@ -21,7 +21,7 @@ public class MyReadWriteTest : MonoBehaviour
                 File.Delete(filePath);
             }
 
-            using (Stream stream = StreamFactory.CreateFileStream(filePath, FileMode.Create, FileAccess.Write))
+            using (Stream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
             {
                 // 写入文件头标识
                 stream.Write(bytes, 0, bytes.Length);
@@ -45,7 +45,7 @@ public class MyReadWriteTest : MonoBehaviour
         }
 
         // 读取文件内容
-        using (Stream stream = StreamFactory.CreateFileStream(filePath, FileMode.Open, FileAccess.Read))
+        using (Stream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
             byte[] readBytes = new byte[bytes.Length];
             int bytesRead = stream.Read(readBytes, 0, readBytes.Length);

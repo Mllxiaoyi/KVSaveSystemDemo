@@ -13,6 +13,7 @@ namespace KVSaveSystem
         {
             get
             {
+                // TODO 接入项目需更改
                 if (_instance == null)
                 {
                     _instance = Resources.Load<ArchiveSettingConfigSO>("ArchiveSettingConfig");
@@ -26,25 +27,27 @@ namespace KVSaveSystem
             }
         }
         
-        [LabelText("默认组别设置")]
-        public ArchiveSetting defaultSetting = new ArchiveSetting(ArchiveOperationType.ZeroFormatterFile, false);
-        
-        [LabelText("特殊组别设置")]
-        public Dictionary<string, ArchiveSetting> specialGroupSettings = new Dictionary<string, ArchiveSetting>();
-        
-        public static IArchiveSetting GetArchiveSetting(string groupName)
+        public static IArchiveSetting GetArchiveSetting(string groupName, bool onlySpecial = false)
         {
             if (Instance)
             {
-                if (_instance.specialGroupSettings != null && _instance.specialGroupSettings.ContainsKey(groupName))
+                if (Instance.specialGroupSettings.TryGetValue(groupName, out var setting))
                 {
-                    return _instance.specialGroupSettings[groupName];
+                    return setting;
                 }
-                return _instance.defaultSetting;
+                return onlySpecial ? null : Instance.defaultSetting;
             }
 
-            return new ArchiveSetting(ArchiveOperationType.ZeroFormatterFile, false);
+            return onlySpecial ? null : new ArchiveSetting(ArchiveOperationType.Nino);
         }
+        
+        
+        
+        [LabelText("默认组别设置")]
+        public ArchiveSetting defaultSetting = new ArchiveSetting(ArchiveOperationType.Nino);
+        
+        [LabelText("特殊组别设置")]
+        public Dictionary<string, ArchiveSetting> specialGroupSettings = new Dictionary<string, ArchiveSetting>();
         
         private void OnEnable()
         {

@@ -100,7 +100,7 @@ public class SetGetSpeedTest : MonoBehaviour
             for (int j = 0; j < testCount; j++)
             {
                 var kv = data[j];
-                KVSaveSystem.KvSaveSystem.SetString(kv.Key, kv.Value);
+                KvSaveSystem.SetString(kv.Key, kv.Value);
             }
 
             sw.Stop();
@@ -198,7 +198,7 @@ public class SetGetSpeedTest : MonoBehaviour
             for (int j = 0; j < testCount; j++)
             {
                 var kv = data[j];
-                KVSaveSystem.KvSaveSystem.GetString(kv.Key, kv.Value);
+                KvSaveSystem.GetString(kv.Key, kv.Value);
             }
 
             sw.Stop();

@@ -46,11 +46,11 @@ MonoBehaviour:
       Data: KVSaveSystem.ArchiveSetting, Assembly-CSharp
     - Name: _archiveOperationMode
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: _isForceSaveSync
       Entry: 5
       Data: false
-    - Name: _isLoadAfterLogin
+    - Name: _isUserArchive
       Entry: 5
       Data: false
     - Name: 
@@ -70,13 +70,13 @@ MonoBehaviour:
       Data: KVSaveSystem.ArchiveSetting, Assembly-CSharp
     - Name: _archiveOperationMode
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: _isForceSaveSync
       Entry: 5
       Data: false
-    - Name: _isLoadAfterLogin
+    - Name: _isUserArchive
       Entry: 5
-      Data: true
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -90,6 +90,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
   defaultSetting:
-    _archiveOperationMode: 1
+    _archiveOperationMode: 0
     _isForceSaveSync: 0
-    _isLoadAfterLogin: 0
+    _isUserArchive: 0

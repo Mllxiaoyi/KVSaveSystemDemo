@@ -1,5 +1,4 @@
 using System;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace KVSaveSystem
@@ -18,12 +17,20 @@ namespace KVSaveSystem
         [SerializeField]
         private bool _isUserArchive;
         public bool IsUserArchive => _isUserArchive;
+        
+        [SerializeField]
+        private bool _isLazyLoad;
+        public bool IsLazyLoad => _isLazyLoad;
 
-        public ArchiveSetting(ArchiveOperationType archiveOperationMode, bool isForceSaveSync)
+        public ArchiveSetting(ArchiveOperationType archiveOperationMode, 
+            bool isForceSaveSync = false, 
+            bool isUserArchive = false, 
+            bool isLazyLoad = false)
         {
             _archiveOperationMode = archiveOperationMode;
             _isForceSaveSync = isForceSaveSync;
-            _isUserArchive = false;
+            _isUserArchive = isUserArchive;
+            _isLazyLoad = isLazyLoad;
         }
     }
 }
