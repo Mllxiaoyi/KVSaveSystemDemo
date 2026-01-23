@@ -34,15 +34,18 @@ namespace KVSaveSystem
             // 1. 序列化
             byte[] serializedData = NinoSerializer.Serialize(dic);
             // 2. 加密
-            serializedData = XorEncryptionAlgorithm.Encrypt(serializedData, XorKey);
+            if (SaveArchiveSettingSO.Instance != null && SaveArchiveSettingSO.Instance.enableEncrypt) 
+                serializedData = XorEncryptionAlgorithm.Encrypt(serializedData, XorKey);
 
             return serializedData;
         }
         
         public static IDictionary<string, ISaveDataObj> ParseBytes(byte[] data)
         {
+            byte[] decryptedData = data;
             // 1. 解密
-            byte[] decryptedData = XorEncryptionAlgorithm.Decrypt(data, XorKey);
+            if (SaveArchiveSettingSO.Instance != null && SaveArchiveSettingSO.Instance.enableEncrypt)
+                decryptedData = XorEncryptionAlgorithm.Decrypt(data, XorKey);
             // 2. 反序列化
             IDictionary<string, ISaveDataObj> dic = NinoDeserializer.Deserialize<ConcurrentDictionary<string, ISaveDataObj>>(decryptedData);
             
@@ -51,7 +54,7 @@ namespace KVSaveSystem
 
         public static void SaveToDisk(KvSaveDataGroup dataGroup)
         {
-            var filePath = SaveConfig.GetGroupFilePath(dataGroup.GroupName);
+            var filePath = KvSaveSystemConst.GetGroupFilePath(dataGroup.GroupName);
             var tmpFilePath = filePath + ".bak";
 
             if (File.Exists(tmpFilePath))
@@ -90,7 +93,7 @@ namespace KVSaveSystem
         {
             var groupName = dataGroup.GroupName;
             var filePath = dataGroup.FilePath;
-            var requestId = Interlocked.Increment(ref _globalRequestId); // 生成唯一的请求ID
+            var requestId = Interlocked.Increment(ref _globalRequestId);
             var tmpFilePath = $"{filePath}.tmp_{requestId}"; // 使用唯一请求ID作为临时文件名避免冲突
 
             if (File.Exists(tmpFilePath))

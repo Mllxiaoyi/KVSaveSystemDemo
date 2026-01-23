@@ -1,11 +1,9 @@
+using KVSaveSystem;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
 public partial class KvSaveSystem : MonoBehaviour
 {
-    [SerializeField] 
-    private SaveConfig _saveConfig;
-
     /// <summary>
     /// 是否开启自动保存（定时刷盘）
     /// </summary>
@@ -27,6 +25,8 @@ public partial class KvSaveSystem : MonoBehaviour
     {
         ResetTimer();
         _needSaveThisFrame = false;
+        LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
+        SaveArchiveSettingSO.Instance.Init();
     }
 
     private void LateUpdate()

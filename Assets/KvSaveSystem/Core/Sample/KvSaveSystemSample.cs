@@ -18,7 +18,7 @@ public class KvSaveSystemSample : MonoBehaviour
     [Button("Load Sample Data")]
     public void LoadSampleData()
     {
-        KvSaveSystem.LoadAll(SaveConfig.PublicArchiveDirectoryPath);
+        KvSaveSystem.LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
         var value = KvSaveSystem.GetInt("FirstEnter", 0, "SampleGroup");
         Debug.Log($"FirstEnter: {value}");
     }
@@ -85,7 +85,7 @@ public class KvSaveSystemSample : MonoBehaviour
             callTimes = callTimes + 1;
             Task.Run(async () =>
             {
-                var tmpPath = SaveConfig.GetGroupFilePath("MultiSave" + callTimes);
+                var tmpPath = KvSaveSystemConst.GetGroupFilePath("MultiSave" + callTimes);
                 var finalPath = tmpPath + ".fin";
 
                 using (Stream stream = new FileStream(tmpPath, FileMode.Create, FileAccess.Write))
@@ -107,7 +107,7 @@ public class KvSaveSystemSample : MonoBehaviour
     [Button("Load Multi Data")]
     public void LoadMultiData()
     {
-        KvSaveSystem.LoadAll(SaveConfig.PublicArchiveDirectoryPath);
+        KvSaveSystem.LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
     }
 
     [Button("Test Concurrent Safety")]
@@ -146,7 +146,7 @@ public class KvSaveSystemSample : MonoBehaviour
 
         // 重新加载验证最终数据
         Debug.Log("📖 重新加载数据进行验证...");
-        KvSaveSystem.LoadAll(SaveConfig.PublicArchiveDirectoryPath);
+        KvSaveSystem.LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
 
         var finalCounter = KvSaveSystem.GetInt("TestCounter", -1, sampleGroupName);
         var finalMessage = KvSaveSystem.GetString("TestMessage", "NOT_FOUND", sampleGroupName);
@@ -172,7 +172,7 @@ public class KvSaveSystemSample : MonoBehaviour
     [Button("测试加载全部")]
     private void LoadAll()
     {
-        KvSaveSystem.LoadAll(SaveConfig.PublicArchiveDirectoryPath);
+        KvSaveSystem.LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
     }
 
 #if UNITY_EDITOR

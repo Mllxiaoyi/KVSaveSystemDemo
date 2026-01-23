@@ -63,14 +63,13 @@ namespace KVSaveSystem
             IsDirty = true;
             IsSaving = false;
             IsLoading = false;
-            ArchiveSetting = ArchiveSettingConfigSO.GetArchiveSetting(groupName);
-            FilePath = SaveConfig.GetGroupFilePath(groupName, ArchiveSetting);
+            ArchiveSetting = SaveArchiveSettingSO.GetArchiveSetting(groupName);
+            FilePath = KvSaveSystemConst.GetGroupFilePath(groupName, ArchiveSetting);
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
         public void SetData<T>(string key, T value)
         {
-            // 直接操作，Unity 主线程天然安全
             if (!DataDic.TryGetValue(key, out var cachedDataObj))
             {
                 DataDic[key] = KvSaveDataFactory.GetSaveDataObj(value);
@@ -95,7 +94,6 @@ namespace KVSaveSystem
 
         public T GetData<T>(string key, T defaultValue = default(T))
         {
-            // 直接读取，Unity 主线程天然安全
             if (DataDic.TryGetValue(key, out var cachedDataObj) &&
                 cachedDataObj is KvSaveDataObj<T> cachedData)
             {
@@ -107,7 +105,6 @@ namespace KVSaveSystem
 
         public void Clear()
         {
-            // 直接清空，Unity 主线程天然安全
             DataDic.Clear();
             IsDirty = true;
         }

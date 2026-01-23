@@ -14,50 +14,6 @@ public partial class KvSaveSystem
 
     private static Dictionary<string, KvSaveDataGroup> _cache = new();
 
-    public static void SetString(string key, string value, string groupName = EMPTY_STRING)
-    {
-        groupName = GetKeyGroupName(key, groupName);
-        SetValue(key, value, groupName);
-    }
-
-    public static string GetString(string key, string defaultValue, string groupName = EMPTY_STRING)
-    {
-        groupName = GetKeyGroupName(key, groupName);
-        return GetValue(key, defaultValue, groupName);
-    }
-
-    public static void SetInt(string key, int value, string groupName = EMPTY_STRING)
-    {
-        groupName = GetKeyGroupName(key, groupName);
-        SetValue(key, value, groupName);
-    }
-
-    public static int GetInt(string key, int defaultValue, string groupName = EMPTY_STRING)
-    {
-        groupName = GetKeyGroupName(key, groupName);
-        return GetValue(key, defaultValue, groupName);
-    }
-
-    public static void SetFloat(string key, float value, string groupName = EMPTY_STRING)
-    {
-        groupName = GetKeyGroupName(key, groupName);
-        SetValue(key, value, groupName);
-    }
-
-    public static float GetFloat(string key, float defaultValue, string groupName = EMPTY_STRING)
-    {
-        groupName = GetKeyGroupName(key, groupName);
-        return GetValue(key, defaultValue, groupName);
-    }
-
-    public static string GetKeyGroupName(string key, string inputGroupName)
-    {
-        if (inputGroupName != EMPTY_STRING)
-            return inputGroupName;
-
-        return DEFAULT_GROUP_NAME;
-    }
-
     /// <summary>
     /// 设置存档数据（缓存）
     /// </summary>
@@ -79,7 +35,7 @@ public partial class KvSaveSystem
     {
         if (!_cache.TryGetValue(groupName, out var groupData))
         {
-            IArchiveSetting archiveSetting = ArchiveSettingConfigSO.GetArchiveSetting(groupName, true);
+            IArchiveSetting archiveSetting = SaveArchiveSettingSO.GetArchiveSetting(groupName, true);
             if (archiveSetting != null && archiveSetting.IsLazyLoad)
             {
                 //懒加载
@@ -135,7 +91,7 @@ public partial class KvSaveSystem
             return;
         }
 
-        var saveFiles = Directory.GetFiles(directoryPath, $"*{SaveConfig.SAVE_FILE_EXTENSION}");
+        var saveFiles = Directory.GetFiles(directoryPath, $"*{KvSaveSystemConst.SAVE_FILE_EXTENSION}");
 
         foreach (var file in saveFiles)
         {
@@ -163,7 +119,7 @@ public partial class KvSaveSystem
             _cache.Remove(groupName);
         }
 
-        var filePath = SaveConfig.GetGroupFilePath(groupName);
+        var filePath = KvSaveSystemConst.GetGroupFilePath(groupName);
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
