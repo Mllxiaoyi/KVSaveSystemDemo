@@ -11,7 +11,7 @@ public class MyReadWriteTest : MonoBehaviour
     [Button]
     void StartTest()
     {
-        var filePath = SaveConfig.GetGroupFilePath("MyReadWrite");
+        var filePath = SaveSystemConst.GetGroupFilePath("MyReadWrite");
         var bytes = Encoding.UTF8.GetBytes("OKOK");
 
         if (doWrite)

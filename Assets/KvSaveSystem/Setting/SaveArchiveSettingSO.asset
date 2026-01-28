@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 906803895d5299146894dc22beb1befa, type: 3}
-  m_Name: ArchiveSettingConfig
+  m_Script: {fileID: 11500000, guid: d082438da02fd684090a0684f76a3b6a, type: 3}
+  m_Name: SaveArchiveSettingSO
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -34,13 +34,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 1
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: First
+      Data: Bag
     - Name: $v
       Entry: 7
       Data: KVSaveSystem.ArchiveSetting, Assembly-CSharp
@@ -52,29 +52,8 @@ MonoBehaviour:
       Data: false
     - Name: _isUserArchive
       Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Event
-    - Name: $v
-      Entry: 7
-      Data: KVSaveSystem.ArchiveSetting, Assembly-CSharp
-    - Name: _archiveOperationMode
-      Entry: 3
-      Data: 0
-    - Name: _isForceSaveSync
-      Entry: 5
-      Data: false
-    - Name: _isUserArchive
+      Data: true
+    - Name: _isLazyLoad
       Entry: 5
       Data: false
     - Name: 
@@ -89,7 +68,10 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+  enableEncrypt: 1
   defaultSetting:
     _archiveOperationMode: 0
     _isForceSaveSync: 0
     _isUserArchive: 0
+    _isLazyLoad: 0
+  isOpenDoubleWrite: 0

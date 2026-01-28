@@ -1,12 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using KVSaveSystem;
 using UnityEngine;
 
 
-public class KvSaveSystemConst
+public class SaveSystemConst
 {
     public const string SAVE_PATH_ROOT = "Save";
     
@@ -60,7 +57,7 @@ public class KvSaveSystemConst
         string groupFileName = $"{groupName}{SAVE_FILE_EXTENSION}";
 
         if (archiveSetting == null)
-            archiveSetting = SaveArchiveSettingSO.GetArchiveSetting(groupName);
+            archiveSetting = SaveArchiveSettingProvider.Current.GetArchiveSetting(groupName);
 
         string groupDirectoryPath = "";
         if (archiveSetting == null || archiveSetting.IsUserArchive == false)

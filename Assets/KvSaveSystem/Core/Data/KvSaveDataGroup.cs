@@ -63,8 +63,8 @@ namespace KVSaveSystem
             IsDirty = true;
             IsSaving = false;
             IsLoading = false;
-            ArchiveSetting = SaveArchiveSettingSO.GetArchiveSetting(groupName);
-            FilePath = KvSaveSystemConst.GetGroupFilePath(groupName, ArchiveSetting);
+            ArchiveSetting = SaveArchiveSettingProvider.Current.GetArchiveSetting(groupName);
+            FilePath = SaveSystemConst.GetGroupFilePath(groupName, ArchiveSetting);
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
@@ -138,7 +138,7 @@ namespace KVSaveSystem
                 _cancellationTokenSource?.Cancel();
                 _cancellationTokenSource = cancelTokenSource;
                 IsSaving = true;
-                SaveSystemLog.Info($"开始保存，组名：{GroupName}");
+                SaveSystemLog.Performance($"开始保存，组名：{GroupName}");
                 
                 await Task.Run(
                     async () => { await FileArchiveOperation.SaveToDiskAsync(this, cancelTokenSource.Token); },
@@ -146,7 +146,7 @@ namespace KVSaveSystem
 
                 stopwatch.Stop();
                 IsDirty = false;
-                SaveSystemLog.Info($"保存完成，组名：{GroupName}，耗时：{stopwatch.ElapsedMilliseconds}ms");
+                SaveSystemLog.Performance($"保存完成，组名：{GroupName}，耗时：{stopwatch.ElapsedMilliseconds}ms");
             }
             catch (OperationCanceledException)
             {
@@ -169,15 +169,36 @@ namespace KVSaveSystem
         public void Load()
         {
             var groupName = GroupName;
+            var isLazyLoad = ArchiveSetting != null && ArchiveSetting.IsLazyLoad;
+            var stopwatch = isLazyLoad ? Stopwatch.StartNew() : null;
+
             try
             {
-                SaveSystemLog.Info($"开始加载组数据：{groupName}");
+                if (isLazyLoad)
+                {
+                    SaveSystemLog.Performance($"开始懒加载组数据：{groupName}");
+                }
+                else
+                {
+                    SaveSystemLog.Performance($"开始加载组数据：{groupName}");
+                }
+
                 FileArchiveOperation.LoadFromDisk(this, FilePath);
                 IsDirty = false;
-                SaveSystemLog.Info($"完成加载组数据：{groupName}");
+
+                if (isLazyLoad && stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    SaveSystemLog.Performance($"完成懒加载组数据：{groupName}，耗时：{stopwatch.ElapsedMilliseconds}ms");
+                }
+                else
+                {
+                    SaveSystemLog.Performance($"完成加载组数据：{groupName}");
+                }
             }
             catch (Exception e)
             {
+                stopwatch?.Stop();
                 SaveSystemLog.Error($"加载组数据失败：{groupName}，异常：{e.Message}");
                 throw; // 重新抛出异常，让调用方决定如何处理
             }

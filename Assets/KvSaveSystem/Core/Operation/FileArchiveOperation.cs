@@ -34,7 +34,7 @@ namespace KVSaveSystem
             // 1. 序列化
             byte[] serializedData = NinoSerializer.Serialize(dic);
             // 2. 加密
-            if (SaveArchiveSettingSO.Instance != null && SaveArchiveSettingSO.Instance.enableEncrypt) 
+            if (SaveArchiveSettingProvider.Current != null && SaveArchiveSettingProvider.Current.EnableEncrypt) 
                 serializedData = XorEncryptionAlgorithm.Encrypt(serializedData, XorKey);
 
             return serializedData;
@@ -44,7 +44,7 @@ namespace KVSaveSystem
         {
             byte[] decryptedData = data;
             // 1. 解密
-            if (SaveArchiveSettingSO.Instance != null && SaveArchiveSettingSO.Instance.enableEncrypt)
+            if (SaveArchiveSettingProvider.Current != null && SaveArchiveSettingProvider.Current.EnableEncrypt)
                 decryptedData = XorEncryptionAlgorithm.Decrypt(data, XorKey);
             // 2. 反序列化
             IDictionary<string, ISaveDataObj> dic = NinoDeserializer.Deserialize<ConcurrentDictionary<string, ISaveDataObj>>(decryptedData);
@@ -54,7 +54,7 @@ namespace KVSaveSystem
 
         public static void SaveToDisk(KvSaveDataGroup dataGroup)
         {
-            var filePath = KvSaveSystemConst.GetGroupFilePath(dataGroup.GroupName);
+            var filePath = SaveSystemConst.GetGroupFilePath(dataGroup.GroupName);
             var tmpFilePath = filePath + ".bak";
 
             if (File.Exists(tmpFilePath))
@@ -255,7 +255,7 @@ namespace KVSaveSystem
                     int footerBytesRead = stream.Read(footerBuffer, 0, FileFooter.Length);
                     if (footerBytesRead == FileFooter.Length && !ArrayEquals(footerBuffer, FileFooter))
                     {
-                        SaveSystemLog.Info($"文件尾标识不匹配，但继续加载，组名：{dataGroup.GroupName}");
+                        SaveSystemLog.Error($"文件尾标识不匹配，但继续加载，组名：{dataGroup.GroupName}");
                     }
                 }
                 
@@ -274,7 +274,7 @@ namespace KVSaveSystem
                 }
                 else
                 {
-                    SaveSystemLog.Info($"反序列化结果为空，组名：{dataGroup.GroupName}");
+                    SaveSystemLog.Error($"反序列化结果为空，组名：{dataGroup.GroupName}");
                 }
             }
         }

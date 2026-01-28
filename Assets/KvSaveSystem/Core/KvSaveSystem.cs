@@ -2,6 +2,9 @@ using KVSaveSystem;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
+/// <summary>
+/// KvSaveSystem Mono 部分
+/// </summary>
 public partial class KvSaveSystem : MonoBehaviour
 {
     /// <summary>
@@ -25,8 +28,8 @@ public partial class KvSaveSystem : MonoBehaviour
     {
         ResetTimer();
         _needSaveThisFrame = false;
-        LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
-        SaveArchiveSettingSO.Instance.Init();
+        LoadAll(SaveSystemConst.PublicArchiveDirectoryPath);
+        SaveArchiveSettingProvider.Current.Init();
     }
 
     private void LateUpdate()

@@ -1,6 +1,7 @@
 using System.Collections;
-using System.IO;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using KVSaveSystem;
+using Nino.Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -8,6 +9,24 @@ using Debug = UnityEngine.Debug;
 public class KvSaveSystemSample : MonoBehaviour
 {
     string sampleGroupName = "SampleGroup";
+    
+    private void Start()
+    {
+        DoTestSerialize();
+    }
+
+    // 测试 Nino 序列化接口（别删）
+    private void DoTestSerialize()
+    {
+        Dictionary<string, ISaveDataObj> dic = new Dictionary<string, ISaveDataObj>();
+        dic.Add("11", new KvSaveDataObj<int>(){Value = 1});
+        dic.Add("12", new KvSaveDataObj<float>(){Value = 1.1f});
+        dic.Add("13", new KvSaveDataObj<string>(){Value = "11"});
+        
+        var bytes = NinoSerializer.Serialize(dic);
+        dic = NinoDeserializer.Deserialize<Dictionary<string, ISaveDataObj>>(bytes);
+    }
+    
 
     [Button("Save Sample Data")]
     public void SaveSampleData()
@@ -18,12 +37,12 @@ public class KvSaveSystemSample : MonoBehaviour
     [Button("Load Sample Data")]
     public void LoadSampleData()
     {
-        KvSaveSystem.LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
+        KvSaveSystem.LoadAll(SaveSystemConst.PublicArchiveDirectoryPath);
         var value = KvSaveSystem.GetInt("FirstEnter", 0, "SampleGroup");
         Debug.Log($"FirstEnter: {value}");
     }
 
-    [Button("Save Multi Data")]
+    [Button("Save Multi Data"), ButtonGroup("SampleGroup")]
     public void SaveMultiData()
     {
         KvSaveSystem.SetInt("FirstEnter", 1, sampleGroupName);
@@ -35,8 +54,9 @@ public class KvSaveSystemSample : MonoBehaviour
 换行2", sampleGroupName);
         KvSaveSystem.SaveAsyncInternal(true);
     }
+    
 
-    [Button("SaveMultiTimesInSingleFrame")]
+    [Button("Save MultiTimes In Single Frame")]
     public void SaveMultiTimesInSingleFrame()
     {
         StartCoroutine(SaveMultiTimesInSingleFrameCo());
@@ -73,42 +93,9 @@ public class KvSaveSystemSample : MonoBehaviour
         
         yield return null;
     }
+    
 
-    private long callTimes = 0;
 
-    [Button("MultiSave")]
-    private void MultiSave()
-    {
-        var repeatTimes = 10000;
-        for (int i = 0; i < repeatTimes; i++)
-        {
-            callTimes = callTimes + 1;
-            Task.Run(async () =>
-            {
-                var tmpPath = KvSaveSystemConst.GetGroupFilePath("MultiSave" + callTimes);
-                var finalPath = tmpPath + ".fin";
-
-                using (Stream stream = new FileStream(tmpPath, FileMode.Create, FileAccess.Write))
-                {
-                    var bytes = new byte[] { 1 };
-                    await stream.WriteAsync(bytes, 0, bytes.Length);
-                    await Task.Delay(200);
-                    await stream.FlushAsync();
-                }
-                
-                if (File.Exists(finalPath))
-                    File.Delete(finalPath);
-                await Task.Delay(500);
-                File.Copy(tmpPath, finalPath);
-            });
-        }
-    }
-
-    [Button("Load Multi Data")]
-    public void LoadMultiData()
-    {
-        KvSaveSystem.LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
-    }
 
     [Button("Test Concurrent Safety")]
     public void TestConcurrentSafety()
@@ -146,7 +133,7 @@ public class KvSaveSystemSample : MonoBehaviour
 
         // 重新加载验证最终数据
         Debug.Log("📖 重新加载数据进行验证...");
-        KvSaveSystem.LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
+        KvSaveSystem.LoadAll(SaveSystemConst.PublicArchiveDirectoryPath);
 
         var finalCounter = KvSaveSystem.GetInt("TestCounter", -1, sampleGroupName);
         var finalMessage = KvSaveSystem.GetString("TestMessage", "NOT_FOUND", sampleGroupName);
@@ -169,17 +156,25 @@ public class KvSaveSystemSample : MonoBehaviour
         Debug.Log("=== 🏁 并发安全性测试完成 ===");
     }
 
-    [Button("测试加载全部")]
+    [Button("Load All")]
     private void LoadAll()
     {
-        KvSaveSystem.LoadAll(KvSaveSystemConst.PublicArchiveDirectoryPath);
+        KvSaveSystem.LoadAll(SaveSystemConst.PublicArchiveDirectoryPath);
+        PrintSaveCacheData();
+    }
+    
+    [Button("Clear Cache")]
+    private void ClearAll()
+    {
+        KvSaveSystem.ClearCache();
+        PrintSaveCacheData();
     }
 
-#if UNITY_EDITOR
     [Button("Print Save Cache Data")]
     public void PrintSaveCacheData()
     {
+#if UNITY_EDITOR
         KvSaveSystem.PrintSaveCacheData();
-    }
 #endif
+    }
 }

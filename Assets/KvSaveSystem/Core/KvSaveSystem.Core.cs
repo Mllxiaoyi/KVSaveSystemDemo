@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 using KVSaveSystem;
 
 /// <summary>
@@ -35,7 +34,7 @@ public partial class KvSaveSystem
     {
         if (!_cache.TryGetValue(groupName, out var groupData))
         {
-            IArchiveSetting archiveSetting = SaveArchiveSettingSO.GetArchiveSetting(groupName, true);
+            IArchiveSetting archiveSetting = SaveArchiveSettingProvider.Current.GetArchiveSetting(groupName, true);
             if (archiveSetting != null && archiveSetting.IsLazyLoad)
             {
                 //懒加载
@@ -91,11 +90,18 @@ public partial class KvSaveSystem
             return;
         }
 
-        var saveFiles = Directory.GetFiles(directoryPath, $"*{KvSaveSystemConst.SAVE_FILE_EXTENSION}");
+        var saveFiles = Directory.GetFiles(directoryPath, $"*{SaveSystemConst.SAVE_FILE_EXTENSION}");
 
         foreach (var file in saveFiles)
         {
             var groupName = Path.GetFileNameWithoutExtension(file);
+
+            // 检查是否为懒加载组，如果是则跳过
+            IArchiveSetting archiveSetting = SaveArchiveSettingProvider.Current.GetArchiveSetting(groupName, true);
+            if (archiveSetting != null && archiveSetting.IsLazyLoad)
+            {
+                continue;
+            }
 
             // 创建或获取组数据
             if (!_cache.TryGetValue(groupName, out var groupData))
@@ -114,12 +120,9 @@ public partial class KvSaveSystem
     /// </summary>
     public static void DeleteGroup(string groupName)
     {
-        if (_cache.ContainsKey(groupName))
-        {
-            _cache.Remove(groupName);
-        }
+        _cache.Remove(groupName);
 
-        var filePath = KvSaveSystemConst.GetGroupFilePath(groupName);
+        var filePath = SaveSystemConst.GetGroupFilePath(groupName);
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
@@ -133,6 +136,19 @@ public partial class KvSaveSystem
     /// <returns></returns>
     public static KvSaveDataGroup GetGroup(string groupName)
     {
+        if (!_cache.TryGetValue(groupName, out var groupData))
+        {
+            // 检查是否为懒加载组，如果是则按需加载
+            IArchiveSetting archiveSetting = SaveArchiveSettingProvider.Current.GetArchiveSetting(groupName, true);
+            if (archiveSetting != null && archiveSetting.IsLazyLoad)
+            {
+                groupData = new KvSaveDataGroup(groupName);
+                groupData.Load();
+                _cache[groupName] = groupData;
+                return groupData;
+            }
+        }
+
         return _cache.GetValueOrDefault(groupName);
     }
 
@@ -154,11 +170,28 @@ public partial class KvSaveSystem
             log += $"Group: {group.GroupName}, IsDirty: {group.IsDirty}, Data Count: {group.DataDic.Count}\n";
             foreach (var dataKvp in group.DataDic)
             {
-                log += $"  Key: {dataKvp.Key}, Type: {dataKvp.Value.GetType().Name}, Value: {dataKvp.Value}\n";
+                log += $"  Key: {dataKvp.Key}, Type: {dataKvp.Value.GetType().Name}";
+                if (dataKvp.Value is KvSaveDataObj<int> intData)
+                {
+                    log += $", Value: {intData.Value}\n";
+                }
+                else if (dataKvp.Value is KvSaveDataObj<string> strData)
+                {
+                    log += $", Value: {strData.Value}\n";
+                }
+                else if (dataKvp.Value is KvSaveDataObj<float> floatData)
+                {
+                    log += $", Value: {floatData.Value}\n";
+                }
+                else
+                {
+                    // 出错了
+                    log += ", Value: [Unsupported Type]\n";
+                }
             }
         }
 
-        Debug.Log(log);
+        UnityEngine.Debug.Log(log);
     }
 #endif
 }
